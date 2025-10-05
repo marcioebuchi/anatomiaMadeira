@@ -2,45 +2,67 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Filtro Dinâmico - Anatomia de Madeiras</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 20px;
+      padding: 15px;
+      font-size: 1rem;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 10px;
+
+    #botoes {
+      margin-bottom: 15px;
     }
-    td {
-      vertical-align: top;
-      padding: 10px;
-      width: 20%;
+
+    #botoes button {
+      padding: 10px 15px;
+      font-size: 1rem;
     }
+
     .filtro-grupo {
-      max-height: 150px; /* Aproximadamente 6 linhas */
+      max-height: 150px;
       overflow-y: auto;
       border: 1px solid #ccc;
       padding: 5px;
+      margin-bottom: 10px;
     }
+
     .filtro-grupo label {
       font-weight: bold;
       display: block;
       margin-bottom: 5px;
     }
-    #resultado {
-      margin-top: 20px;
-    }
-    li {
+
+    #filtros {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
       margin-bottom: 10px;
     }
+
+    .filtro-coluna {
+      flex: 1 1 calc(20% - 10px);
+      min-width: 150px;
+    }
+
     #contador {
       font-weight: bold;
       margin-bottom: 10px;
     }
-    #botoes {
-      margin-bottom: 20px;
+
+    #resultado {
+      margin-top: 10px;
+    }
+
+    li {
+      margin-bottom: 15px;
+    }
+
+    @media (max-width: 768px) {
+      .filtro-coluna {
+        flex: 1 1 100%;
+      }
     }
   </style>
 </head>
@@ -51,7 +73,7 @@
     <button onclick="limparFiltros()">Limpar Filtros</button>
   </div>
 
-  <table id="filtros"></table>
+  <div id="filtros"></div>
 
   <div id="contador"></div>
 
@@ -81,14 +103,10 @@
       const container = document.getElementById('filtros');
       container.innerHTML = '';
 
-      const numColunas = 5;
-      let linha;
-      chaves.forEach((chave, index) => {
-        if (index % numColunas === 0) {
-          linha = container.insertRow();
-        }
+      chaves.forEach(chave => {
+        const coluna = document.createElement('div');
+        coluna.className = 'filtro-coluna';
 
-        const celula = linha.insertCell();
         const grupo = document.createElement('div');
         grupo.className = 'filtro-grupo';
 
@@ -123,7 +141,8 @@
           grupo.appendChild(div);
         });
 
-        celula.appendChild(grupo);
+        coluna.appendChild(grupo);
+        container.appendChild(coluna);
       });
     }
 
