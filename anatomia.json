@@ -27,7 +27,7 @@
             "cor": "Rosa avermelhado",
             "cheiro": "não",
             "desenho": "não",
-            "anel de crescimento": ["distinto", "parênquima", "vasos" ],
+            "anel de crescimento": ["distinto", "parênquima", "vaso" ],
             "porosidade": "anel",
             "agrupamento": ["solitário", "múltiplo radial"],
             "obstrucao": "sim",
