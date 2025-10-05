@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Filtro Dinâmico - Anatomia de Madeiras</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 10px;
+    }
+    td {
+      vertical-align: top;
+      padding: 10px;
+      width: 20%;
+    }
+    .filtro-grupo {
+      max-height: 150px; /* Aproximadamente 6 linhas */
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 5px;
+    }
+    .filtro-grupo label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+    #resultado {
+      margin-top: 20px;
+    }
+    li {
+      margin-bottom: 10px;
+    }
+    #contador {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    #botoes {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Filtro Dinâmico de Espécies de Madeira</h1>
+
+  <div id="botoes">
+    <button onclick="limparFiltros()">Limpar Filtros</button>
+  </div>
+
+  <table id="filtros"></table>
+
+  <div id="contador"></div>
+
+  <h2>Resultados:</h2>
+  <ul id="resultado"></ul>
+
+  <script>
+    let especies = [];
+    let chaves = [];
+
+    fetch('anatomia.json')
+      .then(response => response.json())
+      .then(json => {
+        especies = json.data || [];
+        if (especies.length > 0) {
+          chaves = Object.keys(especies[0]).filter(c => c !== "numero amostra");
+          gerarFiltros();
+          filtrar();
+        }
+      })
+      .catch(error => {
+        console.error('Erro ao carregar o JSON:', error);
+        document.getElementById('resultado').innerHTML = '<li>Erro ao carregar o arquivo anatomia.json</li>';
+      });
+
+    function gerarFiltros() {
+      const container = document.getElementById('filtros');
+      container.innerHTML = '';
+
+      const numColunas = 5;
+      let linha;
+      chaves.forEach((chave, index) => {
+        if (index % numColunas === 0) {
+          linha = container.insertRow();
+        }
+
+        const celula = linha.insertCell();
+        const grupo = document.createElement('div');
+        grupo.className = 'filtro-grupo';
+
+        const label = document.createElement('label');
+        label.textContent = chave + ':';
+        grupo.appendChild(label);
+
+        const valores = new Set();
+        especies.forEach(item => {
+          const valor = item[chave];
+          if (Array.isArray(valor)) {
+            valor.forEach(v => valores.add(v));
+          } else if (valor !== undefined) {
+            valores.add(valor);
+          }
+        });
+
+        [...valores].forEach(valor => {
+          const checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.value = valor;
+          checkbox.name = chave;
+          checkbox.addEventListener('change', filtrar);
+
+          const span = document.createElement('span');
+          span.textContent = ' ' + valor;
+
+          const div = document.createElement('div');
+          div.appendChild(checkbox);
+          div.appendChild(span);
+
+          grupo.appendChild(div);
+        });
+
+        celula.appendChild(grupo);
+      });
+    }
+
+    function filtrar() {
+      const filtros = {};
+      chaves.forEach(chave => {
+        const selecionados = Array.from(document.querySelectorAll(`input[name="${chave}"]:checked`)).map(cb => cb.value);
+        if (selecionados.length > 0) {
+          filtros[chave] = selecionados;
+        }
+      });
+
+      const filtrados = especies.filter(item => {
+        return Object.entries(filtros).every(([chave, valoresSelecionados]) => {
+          const campo = item[chave];
+          if (Array.isArray(campo)) {
+            return valoresSelecionados.some(v => campo.includes(v));
+          } else {
+            return valoresSelecionados.includes(campo);
+          }
+        });
+      });
+
+      const lista = document.getElementById('resultado');
+      const contador = document.getElementById('contador');
+      lista.innerHTML = '';
+
+      contador.textContent = `Total de itens encontrados: ${filtrados.length}`;
+
+      if (filtrados.length === 0) {
+        lista.innerHTML = '<li>Nenhum resultado encontrado.</li>';
+      } else {
+        filtrados.forEach(item => {
+          const li = document.createElement('li');
+          li.innerHTML = `<strong>${item["especie"]}</strong> (${item["nome cientifico"]})<br>
+                          Família: ${item["familia"]}<br>
+                          Grupo: ${item["grupo"]}<br>
+                          Cor: ${item["cor"]}<br>
+                          Cheiro: ${item["cheiro"]}<br>
+                          Desenho: ${item["desenho"]}<br>
+                          Porosidade: ${item["porosidade"]}<br>
+                          Obstrução: ${item["obstrucao"]}<br>
+                          Conteúdo: ${item["conteudo"]}<br>
+                          Raio: ${item["raio"]}<br>
+                          Parênquima: ${item["parenquima"]?.join(", ")}<br>
+                          Agrupamento: ${item["agrupamento"]?.join(", ")}<br>
+                          Anel de crescimento: ${item["anel de crescimento"]?.join(", ")}<br>
+                          ${item["obs"] ? "Obs: " + item["obs"] : ""}
+                          <hr>`;
+          lista.appendChild(li);
+        });
+      }
+    }
+
+    function limparFiltros() {
+      chaves.forEach(chave => {
+        const checkboxes = document.querySelectorAll(`input[name="${chave}"]`);
+        checkboxes.forEach(cb => cb.checked = false);
+      });
+      filtrar();
+    }
+  </script>
+</body>
+</html>
