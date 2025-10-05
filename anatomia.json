@@ -47,7 +47,7 @@
             "cheiro": "não",
             "desenho": "sim",
             "descricao desenho": "Anel de Crescimento - visível em peça grande",
-            "anel de crescimento": ["distinto", "parênquima", "vasos" ],
+            "anel de crescimento": ["distinto", "parênquima", "vaso" ],
             "porosidade": "anel",
             "agrupamento": ["solitário", "múltiplo radial", "tangencial"],
             "obstrucao": "sim",
