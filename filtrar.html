@@ -47,8 +47,14 @@
     }
 
     #contador {
+      position: sticky;
+      top: 0;
+      background-color: #f0f0f0;
+      padding: 10px;
       font-weight: bold;
-      margin-bottom: 10px;
+      font-size: 1.1rem;
+      border-left: 4px solid #007acc;
+      z-index: 100;
     }
 
     #resultado {
@@ -69,13 +75,13 @@
 <body>
   <h1>Filtro Dinâmico de Espécies de Madeira</h1>
 
+  <div id="contador">Total de itens encontrados: 0</div>
+
   <div id="botoes">
     <button onclick="limparFiltros()">Limpar Filtros</button>
   </div>
 
   <div id="filtros"></div>
-
-  <div id="contador"></div>
 
   <h2>Resultados:</h2>
   <ul id="resultado"></ul>
